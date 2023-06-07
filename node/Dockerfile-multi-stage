@@ -1,0 +1,23 @@
+
+FROM node:18-alpine as builder
+
+# copy the source tree and the pom.xml to our new container
+COPY ./ ./
+
+RUN npm install
+
+# Buid
+# RUN npm run build
+# RUN npm run build
+
+CMD ["npm", "run", "start"]
+
+FROM node:18-alpine
+
+# copy only the artifacts we need from the first stage and discard the rest
+#COPY --from=builder /server.js /server.js
+COPY --from=builder ./dist ./dist
+COPY --from=builder ./node_modules ./node_modules
+
+# set the startup command to execute the jar
+CMD ["node", "./dist/server.js"]
